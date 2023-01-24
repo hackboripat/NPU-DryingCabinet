@@ -3,14 +3,14 @@
 #define BLYNK_PRINT Serial
 
 //************************************************************************** testing
-#define BLYNK_TEMPLATE_ID "TMPLwA-VcX0m"
-#define BLYNK_DEVICE_NAME "test mushroom box"
-#define BLYNK_AUTH_TOKEN "dfkp_u_mMxZjh-cRS2tSX-nUyR1J4VOk"
+// #define BLYNK_TEMPLATE_ID "TMPLwA-VcX0m"
+// #define BLYNK_DEVICE_NAME "test mushroom box"
+// #define BLYNK_AUTH_TOKEN "dfkp_u_mMxZjh-cRS2tSX-nUyR1J4VOk"
 //**************************************************************************
 
-// #define BLYNK_TEMPLATE_ID "TMPLl3DcIb5g"
-// #define BLYNK_DEVICE_NAME "Drying Hybrid"
-// #define BLYNK_AUTH_TOKEN "do4r9255waGFvR_AGLGGv0-kQIf0tapW"
+#define BLYNK_TEMPLATE_ID "TMPLl3DcIb5g"
+#define BLYNK_DEVICE_NAME "Drying Hybrid"
+#define BLYNK_AUTH_TOKEN "do4r9255waGFvR_AGLGGv0-kQIf0tapW"
 
 
 #include <FirebaseESP8266.h>
@@ -85,22 +85,22 @@ char auth[] = BLYNK_AUTH_TOKEN; // TOKEN BLYNK
 
 SimpleTimer timer1;  // SimpleTimer
 
-// #define WIFI_SSID "NPU Smart Dryer" // WIFI
-// #define WIFI_PASSWORD "npu1234567"
+#define WIFI_SSID "NPU Smart Dryer" // WIFI
+#define WIFI_PASSWORD "npu1234567"
 //************************************************************************** testing
-#define WIFI_SSID "MY ASUS" // WIFI
-#define WIFI_PASSWORD "z1234567"
+// #define WIFI_SSID "MY ASUS" // WIFI
+// #define WIFI_PASSWORD "z1234567"
 //**************************************************************************
 
 
 
 // -------------------------------------------------------------- firebase
-// #define FIREBASE_HOST "drying-hybrid-default-rtdb.firebaseio.com"
-// #define FIREBASE_KEY "MHNCKhwsQ9uBSyNqBAbRV0tKaq3L39Y7hcEq4epM"
+#define FIREBASE_HOST "drying-hybrid-default-rtdb.firebaseio.com"
+#define FIREBASE_KEY "MHNCKhwsQ9uBSyNqBAbRV0tKaq3L39Y7hcEq4epM"
 
 //************************************************************************** testing
-#define FIREBASE_HOST "https://ninetogo-th-default-rtdb.firebaseio.com/"
-#define FIREBASE_KEY "ejRmBMQnxgMUSHR6OYmTs3ODAbrPqEVdiTkvvtOx"
+// #define FIREBASE_HOST "https://ninetogo-th-default-rtdb.firebaseio.com/"
+// #define FIREBASE_KEY "ejRmBMQnxgMUSHR6OYmTs3ODAbrPqEVdiTkvvtOx"
 //**************************************************************************
 
 StaticJsonDocument<1150> doc;
