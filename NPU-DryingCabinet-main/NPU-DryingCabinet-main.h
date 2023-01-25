@@ -52,14 +52,14 @@ Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, 
 
 
 #define DHTTYPE DHT22
-#define DHTPIN_InsideCabinet 14     // D5
-#define DHTPIN_OutsideCabinet 12    // D6
+// #define DHTPIN_InsideCabinet 14     // D5
+#define DHTPIN_OutsideCabinet 1    // D6
 
 #define dataPin  D5
 #define clockPin D6
 SHT1x sht1x(dataPin, clockPin);
 
-DHT InsideCabinetDHT(DHTPIN_InsideCabinet, DHTTYPE);
+// DHT InsideCabinetDHT(DHTPIN_InsideCabinet, DHTTYPE);
 DHT OutsideCabinetDHT(DHTPIN_OutsideCabinet, DHTTYPE);
 
 float InsideCabinet_Temperature = 0;

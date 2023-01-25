@@ -31,7 +31,7 @@ void setup() {
 
   table_steam(); 
 
-  InsideCabinetDHT.begin(); 
+  // InsideCabinetDHT.begin(); 
   OutsideCabinetDHT.begin();
     
   display.begin(i2c_Address, true);
