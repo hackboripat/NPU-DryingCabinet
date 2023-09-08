@@ -90,10 +90,12 @@ void setup() {
   // timer1.setInterval(100, InsideCabinet_TemperatureHumidity); 
   // timer1.setInterval(100, OutsideCabinet_TemperatureHumidity); 
   // timer1.setInterval(100, ElectricPower_PZEM_004TAC); 
-  timer1.setInterval(100, Firebase_SetData); 
-  timer1.setInterval(20, OLED_Display);
+  timer1.setInterval(300, mainF);
+  // timer1.setInterval(20, OLED_Display);
 
 }
+
+
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -103,40 +105,167 @@ void loop() {
 
 }
 
-
+void mainF()
+{
+  Firebase_SetData();
+  OLED_Display();
+}
 
 void OLED_Display() {
 
-  display.clearDisplay();
-  
-  display.setTextSize(1);
-  display.setTextColor(SH110X_WHITE);
-  display.setCursor(18, 0);
-  
-  display.println("NPU Smart Dryer");
-  
-  display.println("");
+  unsigned long TimeNow = millis();
 
-  display.print(" Power (W): ");
-  display.println(PowerLoad,2);
-  // display.println(" W");
+  if(!(TimeNow - lasttime_display >= 1000))
+  {
+    return;
+  }
 
-  display.println("");
-
-  display.print("  Temp (C): ");
-  display.println(InsideCabinet_Temperature,2);
-  // display.println(" C");
-
-  display.println("");
-  
-  display.print("    RH (%): ");
-  display.println(InsideCabinet_Humidity,0);
-  // display.println(" %");
+  if(TimeNow - switch_lasttime_display >= 5000)
+  {
+    switch_display ++;
+    
+    (switch_display == 4) ? switch_display = 0 : 0;      
+      
+    switch_lasttime_display = millis();
+  }  
 
   
-  display.display();
- 
+// ========================================================== DP_cover
+  if(switch_display == DP_cover) 
+  {
+    display.clearDisplay();
+    
+    display.setTextSize(1);
+    display.setTextColor(SH110X_WHITE);
+    display.setCursor(0, 0);
+    
+    display.println("        WELCOME");
+    
+    display.println("");
+
+    display.setTextSize(2);
+    display.println("   NPU-SD");
+      
+    display.setTextSize(1);
+    display.println("");
+
+    display.println("    NPU Smart Dryer");
+
+    display.println("");
+    
+    display.println("  Energy Engineering ");
+
+    display.display();
+
+    // switch_display = 1 ;
+        
+  }else if (switch_display == DP_power) // ========================================================= DP_power 
+  {
+
+    display.clearDisplay();
+    
+    display.setTextSize(1);
+    display.setTextColor(SH110X_WHITE);
+    display.setCursor(0, 0);
+    
+    display.println("         Power");
+    
+    display.println("");
+
+    display.print("  Power (W): ");
+    display.println(PowerLoad,2);
+    // display.println(" W");
+
+    display.println("");
+
+    display.print("Voltage (V): ");
+    display.println(VoltageLoad,2);
+    // display.println(" C");
+
+    display.println("");
+    
+    display.print("Current (A): ");
+    display.println(CurrentLoad,2);
+    // display.println(" %");
+
+    display.display();  
+    
+    // switch_display = 2 ;
+    
+    
+  }else if (switch_display == DP_InsideCabinet_Temperature_Humidity) // ============================ DP_InsideCabinet_Temperature_Humidity
+  {
+
+   display.clearDisplay();
+    
+    display.setTextSize(1);
+    display.setTextColor(SH110X_WHITE);
+    display.setCursor(0, 0);
+    
+    display.println("        Inside");
+    
+    display.println("");
+
+    display.print("  Temp (C): ");
+    display.println(InsideCabinet_Temperature,2);
+    // display.println(" W");
+
+    display.println("");
+
+    display.print("    RH (%): ");
+    display.println(InsideCabinet_Humidity,2);
+    // display.println(" C");
+
+    display.println("");
+    
+    display.print(" H (kj/kg): ");
+    display.println(InsideCabinet_Enthalpy,2);
+    
+    display.display(); 
+
+    // switch_display = 3 ;
+
+  }else if (switch_display == DP_OutsideCabinet_Temperature_Humidity) // ============ DP_OutsideCabinet_Temperature_Humidity
+  {
+
+   display.clearDisplay();
+    
+    display.setTextSize(1);
+    display.setTextColor(SH110X_WHITE);
+    display.setCursor(0, 0);
+    
+    display.println("        Outside");
+    
+    display.println("");
+
+    display.print("   Temp (C): ");
+    display.println(OutsideCabinet_Temperature,2);
+    // display.println(" W");
+
+    display.println("");
+
+    display.print("     RH (%): ");
+    display.println(OutsideCabinet_Humidity,2);
+    // display.println(" C");
+
+    display.println("");
+    
+    display.print("  H (kj/kg): ");
+    display.println(OutsideCabinet_Enthalpy,2);
+    // display.println(" %");
+
+    display.display();  
+
+    // switch_display = 0;
+
+  }
+
+  lasttime_display =  millis();  
+  
 }
+
+
+//********************************************************************************** blynk_dataset
 // int nummmm = 0;
 void blynk_dataset()
 {
@@ -197,19 +326,27 @@ void InsideCabinet_TemperatureHumidity(){  //-----------------------------------
 
   // InsideCabinet_Humidity = InsideCabinetDHT.readHumidity();        // ดึงค่าความชื้น
   // InsideCabinet_Temperature = InsideCabinetDHT.readTemperature();  // ดึงค่าอุณหภูมิ
+
+  float KeepBack_InsideCabinet_Temperature = InsideCabinet_Temperature;
+  float KeepBack_InsideCabinet_Humidity = InsideCabinet_Humidity;
+  float KeepBack_InsideCabinet_Enthalpy = InsideCabinet_Enthalpy;
+
+
+  
   InsideCabinet_Temperature = sht1x.readTemperatureC();
   InsideCabinet_Humidity = sht1x.readHumidity();
     
   if(!isnan(InsideCabinet_Humidity) || !isnan(InsideCabinet_Temperature)){
     
-    InsideCabinet_Enthalpy = enthalpy(InsideCabinet_Temperature , InsideCabinet_Humidity);  
-    
+    InsideCabinet_Enthalpy = enthalpy(InsideCabinet_Temperature , InsideCabinet_Humidity);     
+     
   }else
   {
+    
     // Serial.println("Error: InsideCabinet_Temperature or InsideCabinet_Humidity");
-    InsideCabinet_Humidity  = 0;
-    InsideCabinet_Temperature = 0;
-    InsideCabinet_Enthalpy = 0;
+    InsideCabinet_Humidity  = KeepBack_InsideCabinet_Temperature;
+    InsideCabinet_Temperature = KeepBack_InsideCabinet_Humidity;
+    InsideCabinet_Enthalpy = KeepBack_InsideCabinet_Enthalpy;
 
   }
 
@@ -233,9 +370,9 @@ void OutsideCabinet_TemperatureHumidity(){  //----------------------------------
   }else
   {
     // Serial.println("Error: OutsideCabinet_Temperature or OutsideCabinet_Humidity");
-    OutsideCabinet_Temperature = 0;
-    OutsideCabinet_Humidity = 0;
-    OutsideCabinet_Enthalpy = 0;
+    // OutsideCabinet_Temperature = 0;
+    // OutsideCabinet_Humidity = 0;
+    // OutsideCabinet_Enthalpy = 0;
   }
 
   DataOutsideCabinet.set("Temperature", OutsideCabinet_Temperature);

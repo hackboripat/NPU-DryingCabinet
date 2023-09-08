@@ -19,96 +19,123 @@ void setup() {
 
   Firebase.begin(FIREBASE_HOST, FIREBASE_KEY);
 
-  timer1.setInterval(60000, SendDataToGooleSheet);
+  // timer1.setInterval(60000, SendDataToGooleSheet);
   timer1.setInterval(100, firebaseGetDataSenser);
   // put your setup code here, to run once:
 }
 
 void loop() {
-  timeClient.update();
+
+  
+  timeClient.update();  
   timer1.run();
+  
+  TimeNow = millis();
+  
+  if (TimeNow - Lasttime_SendDataToGooleSheet >= timedelaysecondtoGooleSheet && Status_GoogleSheet == true)
+  {
+  
+    error_time_SendDataToGooleSheet = (TimeNow - Lasttime_SendDataToGooleSheet) - (timedelaysecondtoGooleSheet);
+    
+    Lasttime_SendDataToGooleSheet = TimeNow - error_time_SendDataToGooleSheet;
+    
+    SendDataToGooleSheet(&check_success_GoogleSheets);
+    
+  }else if(check_success_GoogleSheets == false)
+  {
+
+    SendDataToGooleSheet(&check_success_GoogleSheets);
+    
+  }else if(Status_GoogleSheet == false)
+  {
+    Lasttime_SendDataToGooleSheet = 0;
+    error_time_SendDataToGooleSheet = 0;
+  }
+  
 }
 
-void SendDataToGooleSheet() {
+
+void SendDataToGooleSheet(bool *check_success) {
 //  Serial.println(Status_GoogleSheet);
+  
+  time_t epochTime = timeClient.getEpochTime();
+  struct tm *ptm = gmtime((time_t *)&epochTime);
 
-  if (Status_GoogleSheet == false) {
-    return;    
+  //วัน/เดือน/ปี
+  String date = String(ptm->tm_year + 1900) + "-" + String(ptm->tm_mon + 1) + "-" + String(ptm->tm_mday);
+  //ซั่วโมง/นาที/วินาที
+
+  String time = timeClient.getFormattedTime();
+
+
+  // Serial.println("==========");
+  // Serial.print("Send to ");
+  // Serial.println(host);
+
+
+  //---------------------------------------- Connect to Google host
+
+  if (!client.connect(host, httpsPort)) {
+//      Serial.println("Connection failed");
+
+    *check_success = false;
+    
+    return;
   }
-    time_t epochTime = timeClient.getEpochTime();
-    struct tm *ptm = gmtime((time_t *)&epochTime);
 
-    //วัน/เดือน/ปี
-    String date = String(ptm->tm_year + 1900) + "-" + String(ptm->tm_mon + 1) + "-" + String(ptm->tm_mday);
-    //ซั่วโมง/นาที/วินาที
+  //----------------------------------------
 
-    String time = timeClient.getFormattedTime();
+  //----------------------------------------Processing data and sending data
+  //  String string_temperature =  String(tem);
+  // String string_temperature =  String(tem, DEC);
+  String PowerData = String(PowerLoad, 4); 
 
+  String TempInData = String(InsideCabinet_Temperature, 4);
+  String HumidityInData = String(InsideCabinet_Humidity, 4);
+  String EnthalpyInData = String(InsideCabinet_Enthalpy, 4);
 
-    // Serial.println("==========");
-    // Serial.print("Send to ");
-    // Serial.println(host);
-
-
-    //---------------------------------------- Connect to Google host
-
-    if (!client.connect(host, httpsPort)) {
-      Serial.println("Connection failed");
-      return;
-    }
-
-    //----------------------------------------
-
-    //----------------------------------------Processing data and sending data
-    //  String string_temperature =  String(tem);
-    // String string_temperature =  String(tem, DEC);
-    String PowerData = String(PowerLoad, 4);
-
-    String TempInData = String(InsideCabinet_Temperature, 4);
-    String HumidityInData = String(InsideCabinet_Humidity, 4);
-    String EnthalpyInData = String(InsideCabinet_Enthalpy, 4);
-
-    String TempOutData = String(OutsideCabinet_Temperature, 4);
-    String HumidityOutData = String(OutsideCabinet_Humidity, 4);
-    String EnthalpyOutData = String(OutsideCabinet_Enthalpy, 4);
+  String TempOutData = String(OutsideCabinet_Temperature, 4);
+  String HumidityOutData = String(OutsideCabinet_Humidity, 4);
+  String EnthalpyOutData = String(OutsideCabinet_Enthalpy, 4);
 
 
-    String Data_link_url = "/exec?Date=" + date + "&Time=" + time + "&kW=" + PowerData + "&TempIn=" + TempInData + "&HumidityIn=" + HumidityInData + "&EnthalpyIn=" + EnthalpyInData + "&TempOut=" + TempOutData + "&HumidityOut=" + HumidityOutData + "&EnthalpyOut=" + EnthalpyOutData;
+  String Data_link_url = "/exec?Date=" + date + "&Time=" + time + "&kW=" + PowerData + "&TempIn=" + TempInData + "&HumidityIn=" + HumidityInData + "&EnthalpyIn=" + EnthalpyInData + "&TempOut=" + TempOutData + "&HumidityOut=" + HumidityOutData + "&EnthalpyOut=" + EnthalpyOutData;
 
-    String url = "/macros/s/" + GAS_ID + Data_link_url;
+  String url = "/macros/s/" + GAS_ID + Data_link_url;
 
-    // Serial.print("requesting URL: ");
-    // Serial.println(url);
+  // Serial.print("requesting URL: ");
+  // Serial.println(url);
 
-    client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "User-Agent: BuildFailureDetectorESP8266\r\n" + "Connection: close\r\n\r\n");
+  client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "User-Agent: BuildFailureDetectorESP8266\r\n" + "Connection: close\r\n\r\n");
 
-    // Serial.println("request sent");
-    //----------------------------------------
+  // Serial.println("request sent");
+  //----------------------------------------
 
-    //----------------------------------------Checking whether the data was sent successfully or not
-    // while (client.connected()) {
-    //   String line = client.readStringUntil('\n');
-    //   if (line == "\r") {
-    //     Serial.println("headers received");
-    //     break;
-    //   }
-    // }
+  //----------------------------------------Checking whether the data was sent successfully or not
+  // while (client.connected()) {
+  //   String line = client.readStringUntil('\n');
+  //   if (line == "\r") {
+  //     Serial.println("headers received");
+  //     break;
+  //   }
+  // }
 
-    // String line = client.readStringUntil('\n');
-    // if (line.startsWith("{\"state\":\"success\"")) {
-    //   Serial.println("esp8266/Arduino CI successfull!");
-    // } else {
-    //   Serial.println("esp8266/Arduino CI has failed");
-    // }
-    // Serial.print("reply was : ");
-    // Serial.println(line);
-    // Serial.println("closing connection");
-    // Serial.println("");
-    // Serial.println();
-    // delete client;
-    // client = nullptr;
-    client.stop();
-    // client.clone();
+  // String line = client.readStringUntil('\n');
+  // if (line.startsWith("{\"state\":\"success\"")) {
+  //   Serial.println("esp8266/Arduino CI successfull!");
+  // } else {
+  //   Serial.println("esp8266/Arduino CI has failed");
+  // }
+  // Serial.print("reply was : ");
+  // Serial.println(line);
+  // Serial.println("closing connection");
+  // Serial.println("");
+  // Serial.println();
+  // delete client;
+  // client = nullptr;
+  *check_success = true;
+  client.stop();
+  client.clone();
   
 }
 

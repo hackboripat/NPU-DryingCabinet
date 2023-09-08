@@ -120,4 +120,11 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 bool StatusGoogleSheet = false;
 String GAS_ID_GoogleSheet = "AKfycbziU8kggpVeDZeNahaa6BrsyCUbOecBUNNf96jFFqR_wA2jTBHDsI6Br-l2japngnUG";
 
+unsigned long lasttime_display = 0;
+unsigned long switch_lasttime_display = 0;
+int switch_display = 0;
 
+#define DP_cover 0
+#define DP_power 1
+#define DP_InsideCabinet_Temperature_Humidity 2
+#define DP_OutsideCabinet_Temperature_Humidity 3

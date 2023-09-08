@@ -22,6 +22,12 @@
 const char* host = "script.google.com";
 const int httpsPort = 443;
 String GAS_ID = "AKfycbziU8kggpVeDZeNahaa6BrsyCUbOecBUNNf96jFFqR_wA2jTBHDsI6Br-l2japngnUG";
+bool check_success_GoogleSheets = false;
+unsigned long Lasttime_SendDataToGooleSheet = 0;
+unsigned long error_time_SendDataToGooleSheet = 0;
+int timedelaysecondtoGooleSheet = 60000;
+unsigned long TimeNow = 0;
+
 
 // ClientSecure
 WiFiClientSecure client;
@@ -50,6 +56,3 @@ float OutsideCabinet_Humidity = 0;
 float OutsideCabinet_Enthalpy = 0;
 
 bool Status_GoogleSheet = false;
-
-
-
